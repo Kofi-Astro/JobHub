@@ -1,0 +1,38 @@
+{
+  "apiVersion": "1",
+  "jobs": [
+    {
+      "id": "f0000000-0000-0000-0000-000000000001",
+      "title": "Backend Engineer",
+      "location": "Remote, North America",
+      "secondaryLocations": [],
+      "department": "Engineering",
+      "team": "Platform",
+      "isRemote": true,
+      "descriptionHtml": "<p>Own backend services in TypeScript.</p>",
+      "descriptionPlain": "Own backend services in TypeScript.",
+      "publishedAt": "2026-09-02T00:00:00.000Z",
+      "employmentType": "FullTime",
+      "isListed": true,
+      "jobUrl": "https://jobs.ashbyhq.com/acme/f0000000-0000-0000-0000-000000000001",
+      "applyUrl": "https://jobs.ashbyhq.com/acme/f0000000-0000-0000-0000-000000000001/application",
+      "compensation": { "compensationTierSummary": "$150K – $190K" }
+    },
+    {
+      "id": "f0000000-0000-0000-0000-000000000002",
+      "title": "Growth Marketing Intern",
+      "location": "London, UK",
+      "department": "Marketing",
+      "team": "Growth",
+      "isRemote": false,
+      "descriptionHtml": "<p>Support paid acquisition experiments.</p>",
+      "descriptionPlain": "Support paid acquisition experiments.",
+      "publishedAt": "2026-09-05T00:00:00.000Z",
+      "employmentType": "Intern",
+      "isListed": true,
+      "jobUrl": "https://jobs.ashbyhq.com/acme/f0000000-0000-0000-0000-000000000002",
+      "applyUrl": "https://jobs.ashbyhq.com/acme/f0000000-0000-0000-0000-000000000002/application",
+      "compensation": {}
+    }
+  ]
+}

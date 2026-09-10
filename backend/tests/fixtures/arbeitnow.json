@@ -1,0 +1,30 @@
+{
+  "data": [
+    {
+      "slug": "backend-engineer-berlin-acme-9001",
+      "company_name": "Acme GmbH",
+      "title": "Backend Engineer",
+      "description": "<p>Join our platform team in Berlin.</p>",
+      "remote": false,
+      "url": "https://www.arbeitnow.com/jobs/backend-engineer-berlin-acme-9001",
+      "tags": ["Golang", "Kubernetes"],
+      "job_types": ["full_time"],
+      "location": "Berlin, Germany",
+      "created_at": 1756713600
+    },
+    {
+      "slug": "remote-frontend-developer-globex-9002",
+      "company_name": "Globex",
+      "title": "Remote Frontend Developer",
+      "description": "<p>Build the UI in React.</p>",
+      "remote": true,
+      "url": "https://www.arbeitnow.com/jobs/remote-frontend-developer-globex-9002",
+      "tags": ["React", "TypeScript"],
+      "job_types": ["part_time"],
+      "location": "Remote",
+      "created_at": 1756800000
+    }
+  ],
+  "links": { "first": "https://www.arbeitnow.com/api/job-board-api?page=1", "next": null },
+  "meta": { "current_page": 1, "last_page": 1 }
+}

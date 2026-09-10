@@ -38,6 +38,9 @@ addopts = "-ra -q"
 filterwarnings = [
     "default",
     "error::DeprecationWarning:app",
+    # SQLAlchemy's pooled connections are closed by GC at interpreter exit, not
+    # explicitly — a benign ResourceWarning we don't want cluttering output.
+    "ignore::ResourceWarning",
 ]
 
 [tool.coverage.run]
