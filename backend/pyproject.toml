@@ -1,0 +1,45 @@
+# ===========================================================================
+# Tooling configuration only. The backend is run as a package directory
+# (`app/`), not installed as a distribution, so there is no [project] table —
+# dependencies live in requirements*.txt.
+# ===========================================================================
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["."]
+
+[tool.ruff.lint]
+# A pragmatic, not maximal, rule set:
+#   E,W  pycodestyle      F   pyflakes         I   import sorting
+#   B    bugbear          UP  pyupgrade        C4  comprehensions
+#   SIM  simplify         PL  pylint (subset)  RUF ruff-specific
+select = ["E", "W", "F", "I", "B", "UP", "C4", "SIM", "RUF"]
+ignore = [
+    "E501",    # line length is handled by the formatter, not the linter
+    "B008",    # FastAPI's Depends() in defaults is idiomatic, not a bug
+    "RUF001",  # we write prose comments/docstrings with real typography
+    "RUF002",  # (en dash, em dash, arrows) — intentional, not a mistake
+    "RUF003",
+    "SIM105",  # `contextlib.suppress` is not always clearer than try/except/pass
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Migrations are generated; alembic's template style differs from ours.
+"alembic/versions/*" = ["E", "W", "F", "I", "UP"]
+# Tests use assert freely and long fixture literals.
+"tests/*" = ["PLR2004", "S101"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q"
+# Promote warnings raised by *our* code to errors, but leave third-party /
+# stdlib deprecation noise (which varies by Python version) as plain warnings.
+filterwarnings = [
+    "default",
+    "error::DeprecationWarning:app",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/worker/run.py", "app/ingestion/run.py", "app/seeds/run.py"]

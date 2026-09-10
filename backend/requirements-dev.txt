@@ -1,0 +1,15 @@
+# ===========================================================================
+# Development + test dependencies.
+# Installed into the local Docker image (INSTALL_DEV=true) but NOT into the
+# production image.
+# ===========================================================================
+-r requirements.txt
+
+pytest~=8.3
+pytest-cov~=6.0
+ruff~=0.8                 # linter + formatter
+respx~=0.21               # mock httpx responses in adapter tests (no network in CI)
+
+# NOTE: the whole backend is synchronous (sync SQLAlchemy, sync httpx in
+# adapters, FastAPI TestClient), so pytest-asyncio is deliberately NOT a
+# dependency — there are no async tests to support.

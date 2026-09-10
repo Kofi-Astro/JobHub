@@ -1,0 +1,37 @@
+# ===========================================================================
+# Runtime dependencies (installed in the production image).
+# Dev/test tools live in requirements-dev.txt.
+# Pinned to compatible-release ranges: patch/minor updates allowed, majors not.
+# ===========================================================================
+
+# --- Web framework ---------------------------------------------------------
+fastapi~=0.115            # HTTP framework + OpenAPI
+uvicorn[standard]~=0.32   # ASGI server (used in dev and prod)
+python-multipart~=0.0.12  # form parsing (employer posting form, file-less)
+
+# --- Data / ORM ----------------------------------------------------------------
+sqlalchemy~=2.0.36        # ORM + query builder (2.0 style)
+alembic~=1.14             # schema migrations
+psycopg[binary]~=3.2      # PostgreSQL driver (v3; binary build = no local libpq needed)
+
+# --- Validation / settings ----------------------------------------------
+pydantic~=2.10            # request/response models, RawJob→NormalizedJob contracts
+pydantic-settings~=2.7    # 12-factor config from env
+email-validator~=2.2      # backs pydantic EmailStr
+
+# --- Auth ------------------------------------------------------------------
+pyjwt~=2.10               # access/refresh token signing + verification
+argon2-cffi~=23.1         # password hashing (argon2id)
+
+# --- Ingestion -----------------------------------------------------------------
+httpx~=0.28               # async HTTP client for source adapters
+tenacity~=9.0             # retry/backoff for flaky external APIs
+bleach~=6.2               # HTML sanitization of job descriptions
+pycountry~=24.6           # ISO 3166 country resolution during normalization
+python-dateutil~=2.9      # lenient date parsing from heterogeneous sources
+
+# --- Scheduling --------------------------------------------------------------
+apscheduler~=3.11         # in-process cron for the worker service
+
+# --- Observability -----------------------------------------------------------
+structlog~=24.4           # structured JSON logging

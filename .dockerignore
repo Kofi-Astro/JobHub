@@ -1,0 +1,20 @@
+# Keep the build context small and deterministic.
+.git
+.github
+.vscode
+frontend/node_modules
+frontend/css/tailwind.css
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+.venv
+venv
+.env
+.env.*
+!.env.example
+pgdata
+*.pdf
+ARCHITECTURE.md
+README.md
