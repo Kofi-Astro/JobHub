@@ -22,6 +22,8 @@ ignore = [
     "RUF002",  # (en dash, em dash, arrows) — intentional, not a mistake
     "RUF003",
     "SIM105",  # `contextlib.suppress` is not always clearer than try/except/pass
+    "UP046",   # keep `Generic[T]` form — best-tested with Pydantic v2 generics
+    "UP047",
 ]
 
 [tool.ruff.lint.per-file-ignores]

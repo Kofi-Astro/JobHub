@@ -189,6 +189,10 @@ class Job(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     subfield_id: Mapped[uuid.UUID | None] = mapped_column(
         PgUUID(as_uuid=True), ForeignKey("subfields.id", ondelete="SET NULL")
     )
+    # Read-only convenience relationships for serialization (the classifier and
+    # pipeline write `field_id` / `subfield_id` directly).
+    field: Mapped[Any | None] = relationship("Field", lazy="joined", viewonly=True)
+    subfield: Mapped[Any | None] = relationship("Subfield", lazy="joined", viewonly=True)
     categorization_method: Mapped[CategorizationMethod] = mapped_column(
         pg_enum(CategorizationMethod, "categorization_method"),
         nullable=False,
