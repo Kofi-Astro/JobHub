@@ -51,12 +51,21 @@ def db(_migrated):
     is rolled back at teardown — including anything the code under test
     committed (those become nested SAVEPOINT releases, not real commits).
     """
-    from sqlalchemy import event
+    from sqlalchemy import event, text
 
+    from app.db.base import Base
     from app.db.session import SessionLocal, engine
 
     connection = engine.connect()
     trans = connection.begin()
+
+    # Start every test from an empty database. This TRUNCATE is inside the
+    # outer transaction that gets rolled back at teardown, so a developer's
+    # local data in the same database is untouched after the run — but tests
+    # never see it (or each other's writes).
+    tables = ", ".join(f'"{t}"' for t in Base.metadata.tables)
+    connection.execute(text(f"TRUNCATE {tables} RESTART IDENTITY CASCADE"))
+
     session = SessionLocal(bind=connection, join_transaction_mode="create_savepoint")
 
     # Re-open a SAVEPOINT each time the code under test calls commit().

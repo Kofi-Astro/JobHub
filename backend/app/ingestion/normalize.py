@@ -562,19 +562,20 @@ def parse_posted_at(raw_value: str | None) -> datetime | None:
 # ---------------------------------------------------------------------------
 
 
-def compute_dedupe_hash(
-    company_match_key: str, title: str, country_code: str | None, workplace: WorkplaceType
-) -> str:
+def compute_dedupe_hash(company_match_key: str, title: str, country_code: str | None) -> str:
     """Stable sha1 of the identity of a role, for cross-source dedupe.
 
-    Deliberately coarse: company + normalized title + country + workplace. Two
-    genuinely-different roles at the same company in the same city keep distinct
-    titles, so collisions there are rare; and a coarse key means we under-merge
-    (a harmless duplicate) rather than over-merge (hiding a real job).
+    Deliberately coarse: company + normalized title + country. Workplace type is
+    intentionally NOT part of the key — an aggregator that blanket-labels every
+    job "remote" and the company's own board that says "United States" describe
+    the SAME role, and must still merge. Two genuinely-different roles at one
+    company in one country almost always differ in title, so false merges are
+    rare; and a coarse key errs toward under-merging (a harmless visible
+    duplicate) rather than over-merging (hiding a real job).
     """
     title_key = re.sub(r"[^a-z0-9 ]", "", (title or "").lower())
     title_key = re.sub(r"\s+", " ", title_key).strip()
-    basis = f"{company_match_key}|{title_key}|{country_code or ''}|{workplace.value}"
+    basis = f"{company_match_key}|{title_key}|{country_code or ''}"
     return hashlib.sha1(basis.encode("utf-8")).hexdigest()
 
 
@@ -629,5 +630,5 @@ def normalize(raw: RawJob) -> NormalizedJob:
         category_hint=raw.category_hint,
         tags=[t for t in (raw.tags or []) if t][:20],
         posted_at=parse_posted_at(raw.posted_at_raw),
-        dedupe_hash=compute_dedupe_hash(company_key, title, cc, workplace),
+        dedupe_hash=compute_dedupe_hash(company_key, title, cc),
     )
