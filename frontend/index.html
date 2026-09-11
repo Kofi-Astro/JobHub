@@ -28,6 +28,7 @@
         </a>
         <nav class="flex items-center gap-2 text-sm">
           <a href="saved.html" class="btn-ghost hidden sm:inline-flex">Saved jobs</a>
+          <span id="auth-nav"></span>
           <!-- Clearly separate, signposted entry point for employers (brief). -->
           <a href="employer.html" class="btn-primary">Post a job</a>
         </nav>
@@ -112,6 +113,8 @@
     <script type="module">
       import { initSearchPage } from "./js/pages/searchPage.js";
       import { mountHomeExtras } from "./js/pages/homeExtras.js";
+      import { mountAuthNav } from "./js/components/authNav.js";
+      mountAuthNav(document.getElementById("auth-nav"));
       mountHomeExtras();
       initSearchPage();
     </script>

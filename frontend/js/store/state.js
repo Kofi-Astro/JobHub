@@ -4,8 +4,9 @@
  *
  * Everything here is per-browser and best-effort — every read/write is wrapped
  * so a private window or disabled storage degrades gracefully. When the user
- * signs in (M9) the auth module calls `exportForMerge()` once and POSTs it to
- * `/api/seeker/merge-anon`.
+ * signs in, `auth.js` calls `exportForMerge()` once and POSTs it to
+ * `/api/seeker/merge-anon`, then `clearSavedJobs()` so the account API becomes
+ * the single source of truth going forward.
  */
 
 const KEYS = {
@@ -36,6 +37,12 @@ function write(key, value) {
 
 export function getSavedJobs() {
   return read(KEYS.savedJobs, []);
+}
+
+/** Called once after a first login folds these into the account (auth.js). */
+export function clearSavedJobs() {
+  write(KEYS.savedJobs, []);
+  window.dispatchEvent(new CustomEvent("savedjobschange"));
 }
 
 export function isJobSaved(id) {
@@ -85,8 +92,8 @@ export function getRecentViews() {
 // --- Merge payload for first sign-in --------------------------------
 
 export function exportForMerge() {
-  return {
-    saved_job_ids: getSavedJobs().map((j) => j.id),
-    last_search: getLastSearch(),
-  };
+  // "Resume where you left off" already works per-browser via localStorage
+  // regardless of login state, so only saved jobs need server-side merging —
+  // matches MergeAnonIn on the backend (app/schemas/seeker.py).
+  return { saved_job_ids: getSavedJobs().map((j) => j.id) };
 }

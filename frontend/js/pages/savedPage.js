@@ -1,31 +1,38 @@
 /**
- * Saved jobs page (saved.html) — anonymous, localStorage-backed for now.
+ * Saved jobs page (saved.html).
  *
- * Re-fetches each saved job by id so the card always shows current data (a job
- * may have expired or changed since it was saved); a saved id that 404s is
- * shown as a "no longer available" placeholder rather than silently vanishing.
- *
- * Milestone 9 adds account-backed saved jobs (`GET /api/seeker/saved-jobs`) and
- * a one-time merge of this localStorage list into the account on first login —
- * this module is written so that swap only touches `loadJobs()`.
+ * Logged-in seekers: `GET /api/seeker/saved-jobs` already embeds each job, one
+ * round trip. Anonymous visitors: the ids live in localStorage, so each job is
+ * re-fetched individually — that also means the card always reflects current
+ * data (a job may have expired since it was saved), and a ref that now 404s is
+ * dropped rather than shown as a broken card.
  */
 import { api, ApiError } from "../api/client.js";
 import { el, mount } from "../util/dom.js";
 import { jobCard } from "../components/jobCard.js";
 import { skeletonList } from "../components/skeleton.js";
 import { getSavedJobs } from "../store/state.js";
+import { restoreSession, isLoggedIn } from "../auth.js";
 
 export async function initSavedPage() {
   const root = document.getElementById("saved-root");
-  const saved = getSavedJobs();
+  await restoreSession();
 
+  if (isLoggedIn()) {
+    mount(root, skeletonList(4));
+    const rows = await api.savedJobs();
+    mount(root, rows.length ? rows.map((r) => jobCard(r.job)) : emptyState());
+    return;
+  }
+
+  const saved = getSavedJobs();
   if (!saved.length) {
     mount(root, emptyState());
     return;
   }
 
   mount(root, skeletonList(Math.min(saved.length, 5)));
-  const jobs = await loadJobs(saved);
+  const jobs = await loadAnonJobs(saved);
   mount(root, jobs.length ? jobs.map((j) => jobCard(j)) : emptyState());
 
   // Saving/unsaving from within this page should remove the card immediately.
@@ -39,19 +46,18 @@ export async function initSavedPage() {
   });
 }
 
-async function loadJobs(saved) {
+async function loadAnonJobs(saved) {
   const results = await Promise.allSettled(saved.map((s) => api.getJob(s.id)));
   const jobs = [];
-  results.forEach((r, i) => {
+  for (const r of results) {
     if (r.status === "fulfilled") jobs.push(r.value);
     else if (!(r.reason instanceof ApiError && r.reason.status === 404)) {
-      // A transient error (not "gone") — keep a stub so the user isn't
-      // surprised the job silently disappeared from their saved list.
-      jobs.push(null);
+      // A transient error (not "gone") — surface nothing rather than guess;
+      // the job simply won't appear this load.
+      continue;
     }
-    void i;
-  });
-  return jobs.filter(Boolean);
+  }
+  return jobs;
 }
 
 function emptyState() {

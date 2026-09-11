@@ -76,6 +76,24 @@ export const api = {
   taxonomy: () => request("GET", "/api/taxonomy"),
   countries: () => request("GET", "/api/meta/countries"),
   sources: () => request("GET", "/api/meta/sources"),
+
+  // --- Auth ---
+  registerSeeker: (body) => request("POST", "/api/auth/register/seeker", { body }),
+  registerEmployer: (body) => request("POST", "/api/auth/register/employer", { body }),
+  login: (body) => request("POST", "/api/auth/login", { body }),
+  refresh: () => request("POST", "/api/auth/refresh"),
+  logout: () => request("POST", "/api/auth/logout"),
+  me: () => request("GET", "/api/auth/me"),
+
+  // --- Seeker account ---
+  savedJobs: () => request("GET", "/api/seeker/saved-jobs"),
+  saveJob: (jobId, notes) => request("POST", "/api/seeker/saved-jobs", { body: { job_id: jobId, notes } }),
+  unsaveJob: (jobId) => request("DELETE", `/api/seeker/saved-jobs/${jobId}`),
+  savedSearches: () => request("GET", "/api/seeker/saved-searches"),
+  createSavedSearch: (body) => request("POST", "/api/seeker/saved-searches", { body }),
+  updateSavedSearch: (id, body) => request("PATCH", `/api/seeker/saved-searches/${id}`, { body }),
+  deleteSavedSearch: (id) => request("DELETE", `/api/seeker/saved-searches/${id}`),
+  mergeAnon: (body) => request("POST", "/api/seeker/merge-anon", { body }),
 };
 
 export { request };

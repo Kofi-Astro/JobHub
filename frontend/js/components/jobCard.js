@@ -11,6 +11,16 @@
 import { el, icons } from "../util/dom.js";
 import { formatSalary, humanizeEnum, initials, timeAgo } from "../util/format.js";
 import { isJobSaved, toggleSavedJob } from "../store/state.js";
+import { isLoggedIn, isJobSavedAccount, toggleSavedJobAccount } from "../auth.js";
+
+/** Saved state is account-backed once signed in, localStorage otherwise —
+ * both expose the same {check, toggle} shape so the button below doesn't
+ * need to know which one it's talking to. */
+function savedBackend() {
+  return isLoggedIn()
+    ? { check: isJobSavedAccount, toggle: toggleSavedJobAccount }
+    : { check: isJobSaved, toggle: toggleSavedJob };
+}
 
 /**
  * @param {object} job - a JobCard payload from the API
@@ -51,24 +61,30 @@ export function jobCard(job, opts = {}) {
       el("span", { class: "badge badge-employer", title: "Posted directly by the hiring company" }, "Direct from employer"),
   ]);
 
+  const alreadySaved = savedBackend().check(job.id);
   const saveBtn = el("button", {
     type: "button",
     class:
       "shrink-0 rounded-lg p-2 text-ink-400 transition hover:bg-slate-100 hover:text-brand-500",
-    "aria-label": isJobSaved(job.id) ? "Unsave job" : "Save job",
-    "aria-pressed": String(isJobSaved(job.id)),
-    onClick: (e) => {
+    "aria-label": alreadySaved ? "Unsave job" : "Save job",
+    "aria-pressed": String(alreadySaved),
+    onClick: async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const nowSaved = toggleSavedJob(job);
-      saveBtn.innerHTML = nowSaved ? icons.bookmarkFilled : icons.bookmark;
-      saveBtn.setAttribute("aria-pressed", String(nowSaved));
-      saveBtn.classList.toggle("text-brand-500", nowSaved);
-      opts.onSaveToggle?.(job, nowSaved);
+      saveBtn.disabled = true; // avoid double-toggling on a slow account request
+      try {
+        const nowSaved = await savedBackend().toggle(job);
+        saveBtn.innerHTML = nowSaved ? icons.bookmarkFilled : icons.bookmark;
+        saveBtn.setAttribute("aria-pressed", String(nowSaved));
+        saveBtn.classList.toggle("text-brand-500", nowSaved);
+        opts.onSaveToggle?.(job, nowSaved);
+      } finally {
+        saveBtn.disabled = false;
+      }
     },
-    html: isJobSaved(job.id) ? icons.bookmarkFilled : icons.bookmark,
+    html: alreadySaved ? icons.bookmarkFilled : icons.bookmark,
   });
-  if (isJobSaved(job.id)) saveBtn.classList.add("text-brand-500");
+  if (alreadySaved) saveBtn.classList.add("text-brand-500");
 
   return el("a", { href: `job.html?id=${job.id}`, class: "job-card group" }, [
     el("div", { class: "flex items-start gap-3" }, [

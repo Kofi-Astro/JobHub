@@ -15,6 +15,7 @@ import { CONFIG } from "../config.js";
 import { el, mount } from "../util/dom.js";
 import { readFilters, toParams, writeFilters } from "../util/url.js";
 import { setLastSearch } from "../store/state.js";
+import { restoreSession } from "../auth.js";
 import { jobCard } from "../components/jobCard.js";
 import { skeletonList } from "../components/skeleton.js";
 import { pagination } from "../components/pagination.js";
@@ -70,9 +71,13 @@ export async function initSearchPage() {
     load();
   });
   window.addEventListener("filterschange", load);
+  // Re-render cards after sign-in/out so bookmark icons reflect the right
+  // saved-jobs source (account vs. localStorage).
+  window.addEventListener("authchange", load);
 
   // Reference data (best-effort; the page still works if one fails).
-  const [taxonomy, countries, sources] = await Promise.allSettled([
+  const [, taxonomy, countries, sources] = await Promise.allSettled([
+    restoreSession(),
     api.taxonomy(),
     api.countries(),
     api.sources(),

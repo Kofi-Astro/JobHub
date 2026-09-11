@@ -9,6 +9,13 @@ import { api, ApiError } from "../api/client.js";
 import { el, mount, icons } from "../util/dom.js";
 import { formatSalary, humanizeEnum, initials, timeAgo } from "../util/format.js";
 import { isJobSaved, toggleSavedJob, recordRecentView } from "../store/state.js";
+import { restoreSession, isLoggedIn, isJobSavedAccount, toggleSavedJobAccount } from "../auth.js";
+
+function savedBackend() {
+  return isLoggedIn()
+    ? { check: isJobSavedAccount, toggle: toggleSavedJobAccount }
+    : { check: isJobSaved, toggle: toggleSavedJob };
+}
 
 export async function initJobDetailPage() {
   const root = document.getElementById("job-root");
@@ -18,6 +25,7 @@ export async function initJobDetailPage() {
     return;
   }
 
+  await restoreSession(); // so the save button reflects account state, if any
   try {
     const job = await api.getJob(id);
     document.title = `${job.title} · ${job.company_name} — JobHub`;
@@ -71,21 +79,27 @@ function render(job) {
       ),
     ]);
 
+  const alreadySaved = savedBackend().check(job.id);
   const saveBtn = el(
     "button",
     {
       type: "button",
       class: "btn-ghost",
-      onClick: () => {
-        const nowSaved = toggleSavedJob(job);
-        saveBtn.innerHTML = "";
-        saveBtn.append(
-          spanIcon(nowSaved ? icons.bookmarkFilled : icons.bookmark),
-          document.createTextNode(nowSaved ? "Saved" : "Save job"),
-        );
+      onClick: async () => {
+        saveBtn.disabled = true;
+        try {
+          const nowSaved = await savedBackend().toggle(job);
+          saveBtn.innerHTML = "";
+          saveBtn.append(
+            spanIcon(nowSaved ? icons.bookmarkFilled : icons.bookmark),
+            document.createTextNode(nowSaved ? "Saved" : "Save job"),
+          );
+        } finally {
+          saveBtn.disabled = false;
+        }
       },
     },
-    [spanIcon(isJobSaved(job.id) ? icons.bookmarkFilled : icons.bookmark), isJobSaved(job.id) ? "Saved" : "Save job"],
+    [spanIcon(alreadySaved ? icons.bookmarkFilled : icons.bookmark), alreadySaved ? "Saved" : "Save job"],
   );
 
   return el("div", { class: "mx-auto max-w-3xl" }, [

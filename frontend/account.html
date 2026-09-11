@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Saved jobs — JobHub</title>
+    <title>Sign in — JobHub</title>
     <meta name="jobhub:api-base" content="http://localhost:8000" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -20,27 +20,16 @@
           <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 text-white">J</span>
           JobHub
         </a>
-        <nav class="flex items-center gap-2 text-sm">
-          <a href="saved.html" class="btn-ghost hidden sm:inline-flex" aria-current="page">Saved jobs</a>
-          <span id="auth-nav"></span>
-          <a href="employer.html" class="btn-primary">Post a job</a>
-        </nav>
       </div>
     </header>
 
-    <main class="mx-auto max-w-3xl px-4 py-8">
-      <h1 class="mb-4 text-xl font-bold text-ink-900">Saved jobs</h1>
-      <p class="mb-4 text-sm text-ink-500">
-        Saved on this device. Sign in (coming soon) to keep this list across devices.
-      </p>
-      <div id="saved-root" class="space-y-3"></div>
+    <main class="mx-auto max-w-6xl px-4 py-16">
+      <div id="account-root"></div>
     </main>
 
     <script type="module">
-      import { initSavedPage } from "./js/pages/savedPage.js";
-      import { mountAuthNav } from "./js/components/authNav.js";
-      mountAuthNav(document.getElementById("auth-nav"));
-      initSavedPage();
+      import { initAccountPage } from "./js/pages/accountPage.js";
+      initAccountPage();
     </script>
   </body>
 </html>
