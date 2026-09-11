@@ -227,3 +227,40 @@ def facet_select(q: JobQuery, dimension: str, group_col) -> Select:
         .group_by(group_col)
     )
     return _apply_filters(stmt, q, skip=dimension)
+
+
+# Maps the same key names the frontend puts in the URL query string
+# (see frontend/js/util/url.js) to JobQuery field names, so a saved search's
+# stored `query_params` — captured verbatim from that URL state — replays with
+# identical semantics whether it's the user re-running it live or the worker
+# checking it for new matches.
+_DICT_KEY_MAP = {
+    "field": "field_slugs",
+    "subfield": "subfield_slugs",
+    "country": "country_codes",
+    "workplace": "workplace_types",
+    "job_type": "job_types",
+    "experience": "experience_levels",
+    "source": "source_keys",
+    "remote": "is_remote",
+}
+
+
+def job_query_from_dict(params: dict) -> JobQuery:
+    """Build a `JobQuery` from a saved search's stored filter dict.
+
+    Unknown keys are ignored rather than raising — a saved search should keep
+    working even if the frontend later adds a filter this build doesn't know
+    about yet, and `sort`/`page`/`page_size` are meaningless for an alert scan
+    so they are simply not read here (defaults apply).
+    """
+    kwargs: dict = {}
+    for key, value in (params or {}).items():
+        field_name = _DICT_KEY_MAP.get(key, key)
+        if field_name in JobQuery.__dataclass_fields__ and field_name not in {
+            "sort",
+            "page",
+            "page_size",
+        }:
+            kwargs[field_name] = value
+    return JobQuery(**kwargs)

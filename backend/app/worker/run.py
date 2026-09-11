@@ -1,12 +1,11 @@
-"""Worker entrypoint.
+"""Worker entrypoint: `python -m app.worker.run`.
 
-WHAT: Starts the APScheduler event loop that periodically refreshes sources,
-expires stale jobs, and sends saved-search alerts.
-
-MILESTONE 1 NOTE: the schedule itself is added in milestone 12. For now this
-process just boots cleanly, configures logging, verifies it can reach the
-database, and idles — so `docker compose up` brings up a healthy `worker`
-container from day one and later milestones only add jobs to the scheduler.
+Starts the APScheduler event loop (see `scheduler.py`) that periodically
+refreshes sources, expires stale jobs, and sends saved-search alerts, then
+blocks until the process is asked to stop. This is the process the `worker`
+Railway service (and the `worker` docker-compose service) runs — see
+ARCHITECTURE.md's deployment section for why it's a separate process from the
+API rather than a background thread inside it.
 """
 
 from __future__ import annotations
@@ -18,6 +17,7 @@ from sqlalchemy import text
 
 from app.db.session import engine
 from app.logging import configure_logging, get_logger
+from app.worker.scheduler import build_scheduler
 
 log = get_logger(__name__)
 
@@ -29,13 +29,18 @@ def main() -> None:
     # scheduling jobs that will all error.
     with engine.connect() as conn:
         conn.execute(text("SELECT 1"))
-    log.info("worker.startup", note="scheduler jobs are registered in milestone 12")
+
+    scheduler = build_scheduler()
+    scheduler.start()
+    log.info("worker.startup", jobs=[j.id for j in scheduler.get_jobs()])
 
     # Block until SIGINT/SIGTERM (Railway sends SIGTERM on redeploy).
     stop = threading.Event()
     for sig in (signal.SIGINT, signal.SIGTERM):
         signal.signal(sig, lambda *_: stop.set())
     stop.wait()
+
+    scheduler.shutdown(wait=True)
     log.info("worker.shutdown")
 
 

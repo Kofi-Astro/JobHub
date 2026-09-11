@@ -108,7 +108,7 @@ SOURCES: list[SeedSource] = [
                 "airbnb",
                 "dropbox",
                 "coinbase",
-                "doordash",
+                "doordashusa",
                 "instacart",
                 "robinhood",
                 "flexport",
@@ -128,15 +128,15 @@ SOURCES: list[SeedSource] = [
         rate_limit_per_min=50,
         refresh_interval_minutes=720,
         config={
+            # Verified live against api.lever.co before committing (several
+            # commonly-cited "Lever companies" lists online are stale — many
+            # well-known names have since moved ATS providers and 404 here).
             "companies": [
-                "netflix",
-                "plaid",
-                "ramp",
-                "brex",
-                "notion",
-                "figma",
-                "attentive",
-                "match",
+                "palantir",
+                "matchgroup",
+                "wealthfront",
+                "lever",
+                "kraken",
             ]
         },
         note="Per-company postings. `?mode=json` returns structured data with "
