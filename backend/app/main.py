@@ -85,7 +85,21 @@ def create_app() -> FastAPI:
 
     # --- Routers ------------------------------------------------------------
     # Each milestone registers its router here. Order is cosmetic (docs grouping).
-    from app.api.routes import admin, auth, employer, jobs, meta, seeker, taxonomy
+    from app.api.routes import (
+        admin,
+        admin_analytics,
+        admin_content,
+        admin_jobs,
+        admin_sources,
+        admin_taxonomy,
+        admin_users,
+        auth,
+        employer,
+        jobs,
+        meta,
+        seeker,
+        taxonomy,
+    )
 
     app.include_router(meta.router)
     app.include_router(taxonomy.router)
@@ -94,6 +108,14 @@ def create_app() -> FastAPI:
     app.include_router(seeker.router)
     app.include_router(employer.router)
     app.include_router(admin.router)
+    app.include_router(admin_taxonomy.router)
+    app.include_router(admin_sources.router)
+    app.include_router(admin_jobs.router)
+    app.include_router(admin_users.router)
+    app.include_router(admin_content.admin_content_router)
+    app.include_router(admin_content.admin_announcements_router)
+    app.include_router(admin_content.public_router)
+    app.include_router(admin_analytics.router)
 
     return app
 

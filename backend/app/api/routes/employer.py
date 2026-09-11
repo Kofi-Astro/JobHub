@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import require_role
 from app.db import get_db
 from app.models import Job, User
-from app.models.enums import JobOrigin, JobStatus, UserRole
+from app.models.enums import AnalyticsEventType, JobOrigin, JobStatus, UserRole
 from app.schemas.employer import (
     EmployerJobOut,
     EmployerStatsOut,
@@ -24,6 +24,7 @@ from app.schemas.employer import (
     JobPostUpdateIn,
 )
 from app.schemas.jobs import location_label  # shared display-label logic
+from app.services.analytics import record_event
 from app.services.employer_jobs import (
     EmployerJobError,
     close_employer_job,
@@ -85,6 +86,7 @@ def post_job(
         job = create_employer_job(db, _profile(user), body)
     except EmployerJobError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    record_event(db, AnalyticsEventType.JOB_POST, user_id=user.id, job_id=job.id)
     return _to_out(job)
 
 

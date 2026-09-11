@@ -45,7 +45,7 @@ def _reap_stuck_runs(db: Session) -> None:
     db.commit()
 
 
-def _is_running(db: Session, source: Source) -> bool:
+def is_run_in_progress(db: Session, source: Source) -> bool:
     cutoff = datetime.now(UTC) - STUCK_RUN_TIMEOUT
     return (
         db.scalar(
@@ -72,7 +72,7 @@ def dispatch_due_sources(db: Session) -> list[str]:
     triggered: list[str] = []
 
     for source in db.scalars(select(Source).where(Source.enabled.is_(True))):
-        if _is_running(db, source):
+        if is_run_in_progress(db, source):
             continue
         due = source.last_run_at is None or (
             now - source.last_run_at >= timedelta(minutes=source.refresh_interval_minutes)

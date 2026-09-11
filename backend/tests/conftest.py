@@ -95,6 +95,26 @@ def seeded(db):
 
 
 @pytest.fixture
+def admin_auth(db):
+    """Authorization header for a fresh superadmin (every permission) — the
+    default for admin-route tests; a test that specifically checks role-based
+    restrictions creates its own lower-privileged admin instead."""
+    from app.models import AdminProfile, User
+    from app.models.enums import AdminRole, UserRole
+    from app.services.auth import create_access_token, hash_password
+
+    user = User(
+        role=UserRole.ADMIN, email="super@jobhub.example", password_hash=hash_password("adminpass1")
+    )
+    db.add(user)
+    db.flush()
+    db.add(AdminProfile(user_id=user.id, admin_role=AdminRole.SUPERADMIN))
+    db.commit()
+    token, _ = create_access_token(user)
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
 def client(db):
     """FastAPI TestClient with the DB dependency bound to the test session."""
     from fastapi.testclient import TestClient
