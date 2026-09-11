@@ -263,6 +263,15 @@ def _resolve_country(token: str) -> tuple[str, str] | None:
         return None
 
 
+def country_name_for_code(alpha_2: str | None) -> str | None:
+    """Public lookup used outside this module (e.g. the employer posting form,
+    which collects a plain ISO code and needs the display name filled in)."""
+    if not alpha_2:
+        return None
+    rec = pycountry.countries.get(alpha_2=alpha_2.upper())
+    return rec.name if rec else None
+
+
 def parse_location(
     raw: RawJob,
 ) -> tuple[str | None, str | None, str | None, str | None, bool, WorkplaceType, str | None]:

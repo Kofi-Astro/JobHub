@@ -20,6 +20,7 @@ from app.db import get_db
 from app.models import User
 from app.models.enums import UserRole
 from app.services.auth import InvalidToken, decode_access_token
+from app.services.authz import has_permission
 
 MAX_PAGE_SIZE = 100
 DEFAULT_PAGE_SIZE = 20
@@ -94,6 +95,25 @@ def require_role(*roles: UserRole):
 
     def _dep(user: User = Depends(require_user)) -> User:
         if user.role not in roles:
+            raise HTTPException(status_code=403, detail="Not authorized for this action.")
+        return user
+
+    return _dep
+
+
+_require_admin = require_role(UserRole.ADMIN)
+
+
+def require_admin_permission(permission: str):
+    """Dependency factory for the admin panel: 401/403 like `require_role`,
+    plus a check that this admin's `admin_role` actually grants `permission`
+    (see `services/authz.py` for the role -> permission mapping).
+    """
+
+    def _dep(user: User = Depends(_require_admin)) -> User:
+        if user.admin_profile is None or not has_permission(
+            user.admin_profile.admin_role, permission
+        ):
             raise HTTPException(status_code=403, detail="Not authorized for this action.")
         return user
 

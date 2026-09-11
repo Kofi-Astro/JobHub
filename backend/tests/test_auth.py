@@ -131,6 +131,43 @@ def test_expired_or_garbage_access_token_is_treated_as_anonymous(client, seeded)
     assert resp.status_code == 401  # require_user still 401s — just not a 500
 
 
+def test_refresh_cookie_uses_samesite_none_cross_site_in_production(client, seeded, monkeypatch):
+    """A SameSite=Lax refresh cookie is never sent by the browser on a
+    cross-site fetch() — exactly what happens when the frontend and API are
+    separate origins (the deployed architecture). Production must use
+    SameSite=None (which requires Secure) so the silent-refresh-on-load flow
+    the frontend relies on actually works once deployed. This only checks the
+    header attributes FastAPI/Starlette emit; TestClient does not enforce
+    SameSite the way a real browser does — that gap is exactly why this was
+    initially missed and only caught by an end-to-end browser test."""
+    import app.config as config_module
+
+    config_module.get_settings.cache_clear()
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    try:
+        resp = client.post(
+            "/api/auth/register/seeker",
+            json={"email": "prod-cookie@example.com", "password": "hunter2pass"},
+        )
+        assert resp.status_code == 201
+        set_cookie = resp.headers.get("set-cookie", "")
+        assert "samesite=none" in set_cookie.lower()
+        assert "secure" in set_cookie.lower()
+    finally:
+        monkeypatch.setenv("ENVIRONMENT", "test")
+        config_module.get_settings.cache_clear()
+
+
+def test_refresh_cookie_uses_samesite_lax_locally(client, seeded):
+    resp = client.post(
+        "/api/auth/register/seeker",
+        json={"email": "local-cookie@example.com", "password": "hunter2pass"},
+    )
+    set_cookie = resp.headers.get("set-cookie", "")
+    assert "samesite=lax" in set_cookie.lower()
+    assert "secure" not in set_cookie.lower()
+
+
 def test_refresh_token_is_stored_hashed_not_raw(client, seeded):
     reg = client.post(
         "/api/auth/register/seeker", json={"email": "frank@example.com", "password": "hunter2pass"}

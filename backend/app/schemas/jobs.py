@@ -67,7 +67,7 @@ class JobCard(BaseModel):
             company_name=job.company.name if job.company else job.company_name_raw,
             company_slug=job.company.slug if job.company else None,
             company_logo_url=job.company.logo_url if job.company else None,
-            location_label=_location_label(job),
+            location_label=location_label(job),
             country_code=job.country_code,
             workplace_type=job.workplace_type,
             is_remote=job.is_remote,
@@ -173,7 +173,7 @@ def _salary_out(job: Job) -> SalaryOut | None:
     )
 
 
-def _location_label(job: Job) -> str:
+def location_label(job: Job) -> str:
     if job.is_remote:
         return f"Remote ({job.remote_scope})" if job.remote_scope else "Remote"
     parts = [p for p in (job.city, job.region, job.country_name) if p]

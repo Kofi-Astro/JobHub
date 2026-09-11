@@ -463,6 +463,20 @@ rotating) in an httpOnly cookie. Public endpoints need nothing. `X-Session-Id`
 header (client-generated UUID in `localStorage`) ties anonymous analytics events
 together.
 
+**Cross-site cookie note**: the frontend and API are separate origins, so every
+call the frontend makes — including the silent `/api/auth/refresh` on page
+load — is a cross-site fetch from the browser's perspective. The refresh
+cookie is `SameSite=None; Secure` in staging/production (required for a
+cross-site cookie to be sent on `fetch`/XHR at all) and falls back to
+`SameSite=Lax` locally, because `SameSite=None` requires `Secure`, which
+requires HTTPS — something plain-HTTP local dev cannot provide. This means
+silent refresh across two localhost ports is a known, accepted local-only
+limitation (the in-memory access token still works fine within one page
+session); the production path, over HTTPS, works correctly. This was found by
+an end-to-end browser test, not the API test suite — FastAPI's `TestClient`
+doesn't enforce `SameSite` the way a real browser does, so a regression here
+needs a real-browser check, not just more unit tests.
+
 ---
 
 ## 7. Frontend

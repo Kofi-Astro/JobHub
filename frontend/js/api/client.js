@@ -94,6 +94,15 @@ export const api = {
   updateSavedSearch: (id, body) => request("PATCH", `/api/seeker/saved-searches/${id}`, { body }),
   deleteSavedSearch: (id) => request("DELETE", `/api/seeker/saved-searches/${id}`),
   mergeAnon: (body) => request("POST", "/api/seeker/merge-anon", { body }),
+
+  // --- Employer portal ---
+  postJob: (body) => request("POST", "/api/employer/jobs", { body }),
+  employerJobs: () => request("GET", "/api/employer/jobs"),
+  getEmployerJob: (id) => request("GET", `/api/employer/jobs/${id}`),
+  updateEmployerJob: (id, body) => request("PATCH", `/api/employer/jobs/${id}`, { body }),
+  closeJob: (id) => request("POST", `/api/employer/jobs/${id}/close`),
+  republishJob: (id) => request("POST", `/api/employer/jobs/${id}/republish`),
+  employerStats: () => request("GET", "/api/employer/stats"),
 };
 
 export { request };

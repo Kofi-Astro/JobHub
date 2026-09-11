@@ -59,20 +59,52 @@ REFRESH_COOKIE_PATH = "/api/auth"
 
 
 def _set_refresh_cookie(response: Response, raw_token: str) -> None:
+    """Set the refresh-token cookie with the right cross-site policy.
+
+    The frontend and API are deliberately separate origins (a static host/CDN
+    for the frontend, a Railway service for the API — see ARCHITECTURE.md), so
+    every call the frontend makes, including `POST /api/auth/refresh` on page
+    load, is a CROSS-SITE fetch from the browser's point of view. A
+    `SameSite=Lax` cookie is *not* sent on cross-site fetch/XHR (only on a
+    top-level navigation), so with Lax the silent-refresh-on-load feature
+    silently never works once frontend and API are on different origins —
+    this was caught by an end-to-end browser test, not by the API test suite
+    (FastAPI's TestClient doesn't enforce SameSite at all).
+
+    Fix: `SameSite=None` in staging/production, which browsers accept
+    cross-site — but `SameSite=None` requires the `Secure` attribute, which
+    itself requires HTTPS. Plain-HTTP local dev genuinely cannot satisfy that
+    (not a bug to work around, a browser security rule), so local dev keeps
+    `SameSite=Lax` and silent refresh across two localhost ports is a known,
+    accepted limitation there — everything works normally within one SPA
+    session (the access token lives in memory regardless); only an actual full
+    page reload while relying on the cookie is affected, and only locally.
+    """
     settings = get_settings()
+    cross_site = settings.environment in {"staging", "production"}
     response.set_cookie(
         REFRESH_COOKIE,
         raw_token,
         max_age=settings.jwt_refresh_ttl_days * 86400,
         httponly=True,
-        secure=settings.is_production,
-        samesite="lax",
+        secure=cross_site,  # `Secure` is mandatory whenever SameSite=None
+        samesite="none" if cross_site else "lax",
         path=REFRESH_COOKIE_PATH,
     )
 
 
 def _clear_refresh_cookie(response: Response) -> None:
-    response.delete_cookie(REFRESH_COOKIE, path=REFRESH_COOKIE_PATH)
+    # Browsers match a deletion against the cookie's original attributes, so
+    # this must mirror `_set_refresh_cookie`'s samesite/secure exactly or the
+    # cookie can survive "logout" in cross-site deployments.
+    settings = get_settings()
+    cross_site = settings.environment in {"staging", "production"}
+    response.delete_cookie(
+        REFRESH_COOKIE,
+        path=REFRESH_COOKIE_PATH,
+        secure=cross_site,
+        samesite="none" if cross_site else "lax",
+    )
 
 
 def _client_ip(request: Request) -> str | None:

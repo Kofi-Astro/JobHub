@@ -85,13 +85,15 @@ def create_app() -> FastAPI:
 
     # --- Routers ------------------------------------------------------------
     # Each milestone registers its router here. Order is cosmetic (docs grouping).
-    from app.api.routes import auth, jobs, meta, seeker, taxonomy
+    from app.api.routes import admin, auth, employer, jobs, meta, seeker, taxonomy
 
     app.include_router(meta.router)
     app.include_router(taxonomy.router)
     app.include_router(jobs.router)
     app.include_router(auth.router)
     app.include_router(seeker.router)
+    app.include_router(employer.router)
+    app.include_router(admin.router)
 
     return app
 
