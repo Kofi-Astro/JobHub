@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import (
     Boolean,
@@ -107,6 +108,7 @@ class EmployerProfile(TimestampMixin, Base):
         nullable=False,
         index=True,
     )
+    company: Mapped[Any] = relationship("Company", lazy="joined", viewonly=True)
 
     job_title: Mapped[str | None] = mapped_column(String(255), nullable=True)
     phone: Mapped[str | None] = mapped_column(String(50), nullable=True)

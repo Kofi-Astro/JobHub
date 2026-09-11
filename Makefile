@@ -62,6 +62,10 @@ seed: ## Load taxonomy + source registry seed data
 psql: ## Open a psql prompt
 	$(COMPOSE) exec db psql -U jobhub -d jobhub
 
+.PHONY: create-admin
+create-admin: ## Provision an admin account (prompts for a password)
+	$(API_EXEC) python -m app.seeds.create_admin --email $(email)
+
 ## ---------------------------------------------------------------------------
 ## Ingestion
 ## ---------------------------------------------------------------------------
