@@ -1,0 +1,82 @@
+/*
+ * Tailwind entry file. `npm run build` compiles this to css/tailwind.css
+ * (git-ignored). Keep hand-written CSS to a minimum — only things Tailwind
+ * utilities cannot express cleanly live in @layer components below.
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-slate-50 text-ink-900 antialiased;
+  }
+  /* A visible, consistent focus ring for keyboard users across the whole app. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-white;
+  }
+}
+
+@layer components {
+  /* The primary call-to-action (search button, Apply button). */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500
+      px-4 py-2.5 text-sm font-semibold text-white transition
+      hover:bg-brand-600 active:bg-brand-700 disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border
+      border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-ink-800
+      transition hover:bg-slate-50;
+  }
+
+  /* Job card container — shared by every listing context, no visual bias
+     between aggregated and employer jobs. */
+  .job-card {
+    @apply block rounded-card border border-slate-200 bg-white p-4 shadow-card
+      transition hover:border-brand-200 hover:shadow-card-hover
+      focus-within:border-brand-300 sm:p-5;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs
+      font-medium;
+  }
+  .badge-remote { @apply bg-emerald-50 text-emerald-700; }
+  .badge-employer { @apply bg-brand-50 text-brand-700; }
+  .badge-neutral { @apply bg-slate-100 text-ink-700; }
+
+  /* Filter sidebar checkbox row with a live count on the right. */
+  .filter-row {
+    @apply flex cursor-pointer items-center justify-between gap-2 rounded-md
+      px-2 py-1.5 text-sm hover:bg-slate-50;
+  }
+  .filter-count {
+    @apply shrink-0 rounded-full bg-slate-100 px-1.5 text-xs tabular-nums
+      text-ink-500;
+  }
+
+  /* Rendered job description (sanitized HTML from the API). */
+  .prose-job {
+    @apply text-[15px] leading-relaxed text-ink-800;
+  }
+  .prose-job p { @apply my-3; }
+  .prose-job ul { @apply my-3 list-disc pl-5; }
+  .prose-job ol { @apply my-3 list-decimal pl-5; }
+  .prose-job li { @apply my-1; }
+  .prose-job h1, .prose-job h2, .prose-job h3, .prose-job h4 {
+    @apply mb-2 mt-5 font-semibold text-ink-900;
+  }
+  .prose-job a { @apply text-brand-600 underline; }
+  .prose-job strong { @apply font-semibold text-ink-900; }
+}
+
+/* `ink` is defined via CSS variables so it also works in @apply above. */
+@layer base {
+  :root {
+    --tw-prose-body: #1f2937;
+  }
+}
