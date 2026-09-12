@@ -37,6 +37,7 @@ RUN pip install -r requirements.txt \
 
 # Application code.
 COPY backend/ ./
+RUN chmod +x docker-entrypoint.sh
 
 # Non-root runtime user.
 RUN useradd --create-home --uid 1000 appuser && chown -R appuser:appuser /app
@@ -48,6 +49,10 @@ EXPOSE 8000
 # Container-level healthcheck (Railway also has its own HTTP healthcheck).
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD curl -fsS "http://localhost:${PORT:-8000}/api/health" || exit 1
+
+# Every boot (API or worker) applies pending migrations first — see
+# docker-entrypoint.sh for why this replaced railway.json's preDeployCommand.
+ENTRYPOINT ["./docker-entrypoint.sh"]
 
 # Default = API. The worker service overrides this in railway.json / compose.
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

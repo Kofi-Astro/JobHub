@@ -4,9 +4,9 @@
   "private": true,
   "description": "JobHub static frontend — vanilla ES modules + Tailwind, no framework.",
   "scripts": {
-    "build": "tailwindcss -i ./css/input.css -o ./css/tailwind.css --minify",
+    "build": "node scripts/build.mjs",
     "watch": "tailwindcss -i ./css/input.css -o ./css/tailwind.css --watch",
-    "serve": "npx --yes serve@14 -l 5173 ."
+    "serve": "npm run build && npx --yes serve@14 -l 5173 dist"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.13"

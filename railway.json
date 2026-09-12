@@ -14,8 +14,7 @@
     "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "//": "Migrations run before the new version takes traffic; a bad migration fails the deploy.",
-    "preDeployCommand": "alembic upgrade head",
+    "//": "Migrations run from the container's own entrypoint (backend/docker-entrypoint.sh), not preDeployCommand -- Railway did not reliably invoke preDeployCommand for a service whose settings were first established via the dashboard, so this field is intentionally omitted rather than relied on.",
     "startCommand": "uvicorn app.main:app --host 0.0.0.0 --port $PORT",
     "healthcheckPath": "/api/health",
     "healthcheckTimeout": 30,
