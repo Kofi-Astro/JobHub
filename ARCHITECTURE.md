@@ -4,6 +4,12 @@ This document is the design of record. It explains **what** each part of the
 system does and **why** it is shaped that way. Code comments explain the local
 detail; this file explains the system.
 
+**Status**: every stage below is built — see [§11](#11-build-order-tracks-the-brief)
+for what shipped in which commit, and the README for the current test count.
+This file describes the system as it stands, not a plan; where a design
+decision changed during the build (e.g. the refresh-cookie `SameSite` policy),
+the relevant section says so and explains why.
+
 ---
 
 ## 1. Goals and constraints
@@ -561,11 +567,20 @@ Railway project
 
 ## 11. Build order (tracks the brief)
 
-1. Scaffold + data models + migrations + seeds ← *milestone 1–2*
-2. Adapter framework + 2 adapters end-to-end + normalize + dedupe ← *3–4*
-3. Search/filter/listing API + frontend against real seeded data ← *5–6*
-4. Job detail + apply flow ← *7*
-5. Categorization + admin taxonomy management ← part of *4, 11*
-6. Optional job-seeker accounts, saved state, alerts ← *8–9*
-7. Employer registration + posting portal + moderation queue ← *10*
-8. Full admin interface ← *11*
+All eight steps are built. Each shipped as its own commit on
+`build/jobhub-v1`, in this order:
+
+| # | Step | Landed as |
+|---|------|-----------|
+| 1 | Scaffold + data models + migrations + seeds | commits 1–2 |
+| 2 | Adapter framework + adapters end-to-end + normalize + dedupe | commit 3 (6 keyless adapters shipped, not just 1–2 — see §4.2) |
+| 3 | Search/filter/listing API + frontend against real seeded data | commits 5–6 |
+| 4 | Job detail + apply flow | folded into commit 6 (built alongside search, not after) |
+| 5 | Categorization + admin taxonomy management | commit 4 (classifier) + commit 11 (admin CRUD/remap/review queue) |
+| 6 | Optional job-seeker accounts, saved state, alerts | commits 7–8 (auth + accounts), commit 10 (worker sends the alert emails) |
+| 7 | Employer registration + posting portal + moderation queue | commit 9 |
+| 8 | Full admin interface | commit 11 |
+
+The APScheduler worker (technical requirement, not one of the 8 numbered
+steps) landed as commit 10, once ingestion, categorization, and the employer
+pipeline it schedules all existed to schedule.

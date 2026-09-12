@@ -4,5 +4,5 @@
     run.py         CLI: re-run the classifier over existing jobs
 
 Aggregated jobs are auto-classified here; employer jobs arrive pre-classified
-(the employer picked from the taxonomy) and skip it. Populated in milestone 4.
+(the employer picked from the taxonomy) and skip it.
 """

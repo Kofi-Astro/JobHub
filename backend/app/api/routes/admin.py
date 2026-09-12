@@ -1,9 +1,8 @@
 """Admin: the moderation queue (employer account + job posting approval).
 
-This is the minimum admin surface the brief's moderation requirement needs to
-actually function end to end; the rest of the admin panel (taxonomy, sources,
-users, content, analytics) is built out once the core data flows are proven —
-see ARCHITECTURE.md's build order.
+The rest of the admin panel — taxonomy, sources, general job management,
+users, site content, analytics — lives in its own `admin_*` route module
+alongside this one; see ARCHITECTURE.md's admin-interface section for the map.
 
 Every route requires the `employers.moderate` permission (superadmin and
 moderator, by default — see `services/authz.py`).

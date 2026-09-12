@@ -19,6 +19,7 @@ export async function initSavedPage() {
   await restoreSession();
 
   if (isLoggedIn()) {
+    document.getElementById("anon-note")?.remove(); // account is now the source of truth
     mount(root, skeletonList(4));
     const rows = await api.savedJobs();
     mount(root, rows.length ? rows.map((r) => jobCard(r.job)) : emptyState());

@@ -4,9 +4,10 @@ These have no auth and no side effects. `/api/health` is what the Docker
 HEALTHCHECK and the Railway healthcheck hit, so it must stay cheap and only fail
 when the process genuinely cannot serve traffic.
 
-Later milestones add data-backed meta endpoints here:
-    GET /api/meta/countries  — distinct countries present in active jobs
-    GET /api/meta/sources    — public source list for the "Source" filter
+Also home to the two "what's actually filterable right now" endpoints the
+frontend's filter sidebar reads on load — `/api/meta/countries` and
+`/api/meta/sources` only ever list options that have at least one live job
+behind them, so the UI never offers a filter that would return nothing.
 """
 
 from __future__ import annotations

@@ -1,10 +1,10 @@
 /**
  * Job-seeker account page (account.html): sign in or create an account.
  *
- * This is deliberately seeker-only — employers get their own dedicated
- * registration inside the employer portal (milestone 10), matching the
- * brief's "separate, signposted entry point for employers" away from the
- * regular job-seeker experience.
+ * This is deliberately seeker-only — employers register and sign in from
+ * their own dedicated forms inside employer.html (see js/pages/employerPage.js),
+ * matching the brief's "separate, signposted entry point for employers" away
+ * from the regular job-seeker experience.
  *
  * On success, redirects to `?next=` if present (so "sign in to save this job"
  * style links can return the user where they started), else the homepage.

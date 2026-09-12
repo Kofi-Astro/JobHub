@@ -1,9 +1,8 @@
-"""Admin schemas.
+"""Admin schemas: the employer-account and employer-posting moderation queue.
 
-Only the moderation-queue shapes live here for now (employer accounts +
-employer job postings) — the rest of the admin surface (taxonomy management,
-source registry, users, site content, analytics) is built out in a later
-milestone once the core data flows are stable, per the brief's build order.
+The rest of the admin surface has its own schema modules alongside its own
+route modules — see `schemas/admin_catalog.py` (taxonomy, sources) and
+`schemas/admin_ops.py` (jobs, users, content, analytics).
 """
 
 from __future__ import annotations

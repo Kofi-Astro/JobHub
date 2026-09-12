@@ -2,5 +2,9 @@
 
 Runs as its own process (`python -m app.worker.run`), separate from the API, so
 scheduled work cannot slow down request handling and can be scaled/restarted
-independently. Fleshed out in milestone 12; `run.py` here is the entrypoint.
+independently.
+
+    run.py         entrypoint — boots the APScheduler event loop
+    scheduler.py    wires tasks.py's functions onto their intervals
+    tasks.py        the actual jobs: source dispatch, staleness expiry, alerts
 """

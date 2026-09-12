@@ -7,6 +7,14 @@ path — no subscription gates, no lead-gen middlemen.
 
 > Full system design lives in [`ARCHITECTURE.md`](./ARCHITECTURE.md). Read that first.
 
+**Status**: feature-complete for v1 — ingestion (6 live adapters + 3 keyed ones
+ready behind a config flip), keyword categorization, search/filter/facets,
+job-seeker accounts, the employer posting portal + moderation queue, the full
+admin panel, and the APScheduler worker are all built and covered by 157
+backend tests (`make test`). Verified against live third-party APIs, not just
+fixtures — see the milestone commit history for what that turned up. CI
+(`.github/workflows/ci.yml`) lints and tests every push/PR.
+
 ---
 
 ## Tech stack
@@ -35,20 +43,22 @@ JobHub/
 │   │   ├── db/             # engine, session, base
 │   │   ├── models/         # SQLAlchemy ORM models (the data model)
 │   │   ├── schemas/        # Pydantic request/response contracts
-│   │   ├── api/routes/     # HTTP endpoints
+│   │   ├── api/routes/     # HTTP endpoints (public + auth + admin_*)
 │   │   ├── ingestion/      # source adapters + normalize + dedupe pipeline
 │   │   ├── categorization/ # keyword classifier (field/sub-field)
-│   │   ├── services/       # search, auth, moderation, analytics
+│   │   ├── services/       # search, auth, authz, moderation, analytics, email
 │   │   ├── worker/         # APScheduler setup + scheduled tasks
-│   │   └── seeds/          # taxonomy + source seed data
+│   │   └── seeds/          # taxonomy + source seed data + create_admin CLI
 │   ├── alembic/            # database migrations
-│   └── tests/
+│   └── tests/              # 157 tests — unit, adapter contract, API, RBAC
 └── frontend/               # static site (served by any static host / CDN)
     ├── index.html          # search-first homepage
-    ├── job.html            # job detail + apply
-    ├── employer.html       # employer portal ("Post a job")
-    ├── admin.html          # admin panel
-    └── js/                 # ES modules: api client, components, pages, store
+    ├── job.html             # job detail + apply
+    ├── account.html         # job-seeker sign in / register
+    ├── saved.html           # saved jobs
+    ├── employer.html        # employer portal (register/sign in + dashboard)
+    ├── admin.html           # admin panel (taxonomy, sources, jobs, users, …)
+    └── js/                 # ES modules: api client, auth, components, pages, admin/
 ```
 
 ## Quick start (local, Docker)
@@ -59,6 +69,7 @@ make up                       # starts postgres + api + worker
 make migrate                  # create database schema
 make seed                     # load taxonomy + source registry
 make ingest SOURCE=remotive   # pull a batch of real jobs right now
+make create-admin email=you@example.com   # provision your first admin login
 open http://localhost:8000/docs   # interactive API docs
 ```
 
@@ -80,7 +91,14 @@ pip install -r requirements.txt
 export DATABASE_URL=postgresql+psycopg://localhost/jobhub
 alembic upgrade head
 python -m app.seeds.run
+python -m app.seeds.create_admin --email you@example.com   # first admin login
 uvicorn app.main:app --reload
+```
+
+Then, in a second terminal, start the worker (source refresh, expiry, alerts):
+
+```bash
+python -m app.worker.run
 ```
 
 ## Deployment (Railway)
@@ -102,4 +120,8 @@ See [`ARCHITECTURE.md` → Deployment](./ARCHITECTURE.md#deployment) for details
 
 ```bash
 make test          # pytest (unit + adapter contract tests against recorded fixtures)
+make lint          # ruff check + format --check
 ```
+
+`.github/workflows/ci.yml` runs both (plus a frontend syntax/build check) on
+every push and pull request, against a real Postgres service container.

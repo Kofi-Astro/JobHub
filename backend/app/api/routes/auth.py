@@ -199,7 +199,7 @@ def register_employer(
             phone=body.phone,
             # New employer accounts are flagged for admin approval before
             # going live (brief) — they can sign in, but posting is gated on
-            # this status until milestone 10's moderation queue approves it.
+            # this status until an admin approves it (routes/admin.py).
             account_status=EmployerAccountStatus.PENDING,
         )
     )
