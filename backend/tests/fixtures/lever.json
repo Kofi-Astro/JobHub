@@ -1,0 +1,34 @@
+[
+  {
+    "id": "a1b2c3d4-0000-0000-0000-000000000001",
+    "text": "Senior Product Manager",
+    "hostedUrl": "https://jobs.lever.co/acme/a1b2c3d4-0000-0000-0000-000000000001",
+    "applyUrl": "https://jobs.lever.co/acme/a1b2c3d4-0000-0000-0000-000000000001/apply",
+    "createdAt": 1756713600000,
+    "workplaceType": "hybrid",
+    "categories": {
+      "commitment": "Full-time",
+      "location": "New York",
+      "team": "Product",
+      "department": "Product & Design"
+    },
+    "description": "<p>Lead the roadmap for our core product.</p>",
+    "descriptionPlain": "Lead the roadmap for our core product."
+  },
+  {
+    "id": "a1b2c3d4-0000-0000-0000-000000000002",
+    "text": "Site Reliability Engineer",
+    "hostedUrl": "https://jobs.lever.co/acme/a1b2c3d4-0000-0000-0000-000000000002",
+    "applyUrl": "https://jobs.lever.co/acme/a1b2c3d4-0000-0000-0000-000000000002/apply",
+    "createdAt": 1756800000000,
+    "workplaceType": "remote",
+    "categories": {
+      "commitment": "Full-time",
+      "location": "Remote (US)",
+      "team": "Infrastructure",
+      "department": "Engineering"
+    },
+    "description": "<p>Keep our Kubernetes clusters healthy.</p>",
+    "descriptionPlain": "Keep our Kubernetes clusters healthy."
+  }
+]

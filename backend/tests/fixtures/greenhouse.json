@@ -1,0 +1,25 @@
+{
+  "jobs": [
+    {
+      "id": 5000001,
+      "title": "Staff Software Engineer, Payments",
+      "updated_at": "2026-09-01T12:00:00-04:00",
+      "location": { "name": "San Francisco, CA" },
+      "absolute_url": "https://job-boards.greenhouse.io/acme/jobs/5000001",
+      "content": "&lt;p&gt;Build the payments platform.&lt;/p&gt;",
+      "departments": [{ "id": 1, "name": "Engineering" }],
+      "offices": [{ "id": 1, "name": "San Francisco" }]
+    },
+    {
+      "id": 5000002,
+      "title": "Product Marketing Manager",
+      "updated_at": "2026-09-04T09:00:00-04:00",
+      "location": { "name": "Remote - US" },
+      "absolute_url": "https://job-boards.greenhouse.io/acme/jobs/5000002",
+      "content": "&lt;p&gt;Own go-to-market for our API products.&lt;/p&gt;",
+      "departments": [{ "id": 2, "name": "Marketing" }],
+      "offices": []
+    }
+  ],
+  "meta": { "total": 2 }
+}

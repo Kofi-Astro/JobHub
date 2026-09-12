@@ -1,0 +1,35 @@
+[
+  {
+    "legal": "Scraping this data is not allowed. Use the RemoteOK API.",
+    "0": "See https://remoteok.com/api for more"
+  },
+  {
+    "slug": "nimbus-cloud-senior-backend-engineer",
+    "id": "1900050",
+    "epoch": 1756713600,
+    "date": "2026-09-01T10:00:00+00:00",
+    "company": "Nimbus Cloud",
+    "position": "Senior Backend Engineer",
+    "tags": ["python", "backend", "fastapi"],
+    "description": "Work on our Python/FastAPI platform.",
+    "location": "Worldwide",
+    "salary_min": 120000,
+    "salary_max": 160000,
+    "url": "https://remoteok.com/remote-jobs/1900050",
+    "apply_url": "https://remoteok.com/remote-jobs/1900050"
+  },
+  {
+    "slug": "datafox-data-scientist",
+    "id": "1900051",
+    "epoch": 1756800000,
+    "date": "2026-09-02T09:00:00+00:00",
+    "company": "DataFox",
+    "position": "Data Scientist",
+    "tags": ["python", "ml"],
+    "description": "Build ML models.",
+    "location": "Europe",
+    "salary_min": 0,
+    "salary_max": 0,
+    "url": "https://remoteok.com/remote-jobs/1900051"
+  }
+]

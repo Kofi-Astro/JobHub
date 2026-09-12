@@ -1,0 +1,25 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "//": [
+    "Config for the JobHub API service. The worker service reuses this same",
+    "Dockerfile but sets its own start command (python -m app.worker.run) in the",
+    "Railway dashboard.",
+    "",
+    "Provision a PostgreSQL plugin in the same project; it injects DATABASE_URL.",
+    "Set JWT_SECRET, SMTP_*, and any ADZUNA_*/JOOBLE_*/USAJOBS_* keys as service",
+    "variables (see .env.example)."
+  ],
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile"
+  },
+  "deploy": {
+    "//": "Migrations run before the new version takes traffic; a bad migration fails the deploy.",
+    "preDeployCommand": "alembic upgrade head",
+    "startCommand": "uvicorn app.main:app --host 0.0.0.0 --port $PORT",
+    "healthcheckPath": "/api/health",
+    "healthcheckTimeout": 30,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 3
+  }
+}

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JobHub — Find your next job</title>
+    <meta
+      name="description"
+      content="Search real job openings from many sources worldwide, plus listings straight from employers. Every job links to a direct application — no gates."
+    />
+    <!-- Deploy step: replace with the API origin (or template it). Falls back to same-origin. -->
+    <meta name="jobhub:api-base" content="http://localhost:8000" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/tailwind.css" />
+  </head>
+  <body class="min-h-screen">
+    <!-- ============================ Header ============================ -->
+    <header class="border-b border-slate-200 bg-white">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <a href="index.html" class="flex items-center gap-2 text-lg font-bold text-ink-900">
+          <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 text-white">J</span>
+          JobHub
+        </a>
+        <nav class="flex items-center gap-2 text-sm">
+          <a href="saved.html" class="btn-ghost hidden sm:inline-flex">Saved jobs</a>
+          <span id="auth-nav"></span>
+          <!-- Clearly separate, signposted entry point for employers (brief). -->
+          <a href="employer.html" class="btn-primary">Post a job</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- ============================ Hero ============================= -->
+    <section class="border-b border-slate-200 bg-gradient-to-b from-white to-slate-50">
+      <div class="mx-auto max-w-3xl px-4 py-10 text-center sm:py-14">
+        <h1 class="text-2xl font-bold tracking-tight text-ink-900 sm:text-4xl">
+          Every job, one search.
+        </h1>
+        <p class="mx-auto mt-2 max-w-xl text-ink-600">
+          Real openings aggregated worldwide, plus listings direct from employers.
+          Every one links straight to the application.
+        </p>
+        <div id="hero-search" class="mx-auto mt-6 max-w-xl"></div>
+        <div id="popular-categories" class="mt-4 flex flex-wrap justify-center gap-2 text-sm"></div>
+      </div>
+    </section>
+
+    <!-- ======================== Results area ======================== -->
+    <main class="mx-auto max-w-6xl px-4 py-6">
+      <div class="lg:grid lg:grid-cols-[16rem_1fr] lg:gap-8">
+        <!-- Sidebar: sticky column on desktop -->
+        <aside class="hidden lg:block">
+          <div class="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto pr-1">
+            <h2 class="mb-1 text-sm font-bold uppercase tracking-wide text-ink-500">Filters</h2>
+            <div id="filter-sidebar"></div>
+          </div>
+        </aside>
+
+        <section>
+          <!-- Results header: search + sort + (mobile) filter button -->
+          <div class="mb-4 space-y-3">
+            <div id="search-bar"></div>
+            <div class="flex items-center justify-between gap-3">
+              <p id="results-meta" class="text-sm text-ink-500">Loading…</p>
+              <div class="flex items-center gap-2">
+                <button id="filter-toggle" type="button" class="btn-ghost lg:hidden">
+                  Filters
+                </button>
+                <label class="sr-only" for="sort-select">Sort by</label>
+                <select
+                  id="sort-select"
+                  class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+                >
+                  <option value="relevance">Most relevant</option>
+                  <option value="recent">Newest first</option>
+                  <option value="salary">Highest salary</option>
+                </select>
+              </div>
+            </div>
+            <div id="active-filters"></div>
+          </div>
+
+          <div id="results" class="space-y-3"></div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="mt-10 border-t border-slate-200 bg-white">
+      <div class="mx-auto max-w-6xl px-4 py-6 text-sm text-ink-500">
+        JobHub aggregates public job listings and employer submissions. Every listing links to a
+        direct application — no paid gates, no middlemen.
+      </div>
+    </footer>
+
+    <!-- ================= Mobile filter bottom-sheet ================= -->
+    <div id="filter-sheet" class="fixed inset-0 z-40 hidden bg-black/30 lg:hidden">
+      <div class="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-white p-4">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-base font-bold">Filters</h2>
+          <button id="filter-sheet-close" type="button" class="rounded-lg p-2 hover:bg-slate-100">
+            ✕
+          </button>
+        </div>
+        <div id="filter-sheet-body"></div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initSearchPage } from "./js/pages/searchPage.js";
+      import { mountHomeExtras } from "./js/pages/homeExtras.js";
+      import { mountAuthNav } from "./js/components/authNav.js";
+      mountAuthNav(document.getElementById("auth-nav"));
+      mountHomeExtras();
+      initSearchPage();
+    </script>
+  </body>
+</html>

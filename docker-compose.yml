@@ -1,0 +1,69 @@
+# ===========================================================================
+# Local development stack.
+#
+#   make up        → start everything
+#   make logs      → tail logs
+#   make down      → stop (keeps the db volume)
+#
+# Production does NOT use this file — Railway runs the Dockerfile directly as two
+# services (api, worker) against a managed Postgres. This is dev convenience only.
+# ===========================================================================
+
+# API and worker are the SAME image with different start commands. This anchor
+# builds it once (with dev tools) and both services reuse it.
+x-app-build: &app-build
+  image: jobhub-app:local
+  build:
+    context: .
+    dockerfile: Dockerfile
+    args:
+      INSTALL_DEV: "true"   # local image also gets pytest/ruff/respx
+  env_file:
+    - .env
+  environment:
+    # Inside the compose network the db host is "db", not localhost.
+    DATABASE_URL: postgresql+psycopg://jobhub:jobhub@db:5432/jobhub
+    ENVIRONMENT: local
+  volumes:
+    - ./backend:/app       # bind-mount source for live reload
+  depends_on:
+    db:
+      condition: service_healthy
+
+services:
+  # --- PostgreSQL ----------------------------------------------------------
+  # Pinned to 16 to match the Railway plugin. `citext` + `pg_trgm` extensions
+  # are created by the first migration, not here.
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: jobhub
+      POSTGRES_PASSWORD: jobhub
+      POSTGRES_DB: jobhub
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # The api/worker containers wait on this before starting.
+      test: ["CMD-SHELL", "pg_isready -U jobhub -d jobhub"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  # --- API -----------------------------------------------------------------
+  api:
+    <<: *app-build
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+
+  # --- Background worker -------------------------------------------------
+  # Same image, different entrypoint: APScheduler (source refresh, staleness
+  # expiry, saved-search alerts).
+  worker:
+    <<: *app-build
+    command: python -m app.worker.run
+
+volumes:
+  pgdata:
